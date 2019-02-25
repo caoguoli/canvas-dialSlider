@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" context="ie=edge">
+    <title>Canvas</title>
+</head>
+
+<body>
+    <canvas id="canvas" width="250" height="250"></canvas>
+</body>
+<script src="./jquery-3.2.1.min.js"></script>
+<script>
+
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+
+    var xiaoyuanY = 0;
+    var xiaoyuanX = 0;
+    var xiaoyunaCir = 10;
+    var min = 0;
+    var max = 80;
+    getCanvasFn(90, 10, min, max, xiaoyunaCir);
+    function getCanvasFn(r, cirWidth, min_wind, max_wind, now_wind) {
+
+        var cirMin = 0.75;
+        var cirMax = (2.25 - 0.75) * now_wind / (max_wind - min_wind) + 0.75;
+
+        var x1 = r * Math.cos(cirMax * Math.PI);
+        var y1 = r * Math.sin(cirMax * Math.PI);
+        xiaoyuanX = Math.ceil(125 + x1);
+        xiaoyuanY = Math.ceil(125 + y1);
+        // console.log('x1,y1=======================>',125 + x1, );
+
+
+        var canvas_X = canvas.width;
+        var canvas_Y = canvas.height;
+        ctx.save();
+        ctx.clearRect(0, 0, canvas_X, canvas_Y); // 清除画布
+        // ctx.save();  
+        // 背景
+        ctx.fillStyle = "#0082FF";
+        ctx.fillRect(0, 0, 250, 250);
+        // 静态显示
+        // -- 背景圆
+        ctx.beginPath();
+        ctx.translate(canvas_X / 2, canvas_Y / 2);
+        ctx.lineWidth = cirWidth;
+        ctx.strokeStyle = "#048FEB";
+        ctx.arc(0, 0, r, cirMin * Math.PI, 2.25 * Math.PI, false);
+        ctx.stroke();
+        // -- 范围
+        // ===== min
+        ctx.beginPath();
+        var leftX_x1 = (r - cirWidth / 2) * Math.cos(0.735 * Math.PI);
+        var leftY_y1 = (r - cirWidth / 2) * Math.sin(0.735 * Math.PI);
+        var leftX_x2 = (r + cirWidth * 2) * Math.cos(0.735 * Math.PI);
+        var leftY_y2 = (r + cirWidth * 2) * Math.sin(0.735 * Math.PI);
+        ctx.moveTo(leftX_x1, leftY_y1);
+        ctx.lineTo(leftX_x2, leftY_y2);
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        // 字体
+        ctx.beginPath();
+        ctx.font = "normal 14px Arical";
+        ctx.fillStyle = "#fff"
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText(min_wind, leftX_x2 - 20, leftY_y2 + 5);
+        ctx.font = "normal 8px Arical";
+        ctx.fillStyle = "#fff"
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText("℃", leftX_x2 - 10, leftY_y2 + 5);
+
+        // ===== max
+        ctx.beginPath();
+        var rightX_x1 = (r - cirWidth / 2) * Math.cos(2.265 * Math.PI);
+        var rightY_y1 = (r - cirWidth / 2) * Math.sin(2.265 * Math.PI);
+        var rightX_x2 = (r + cirWidth * 2) * Math.cos(2.265 * Math.PI);
+        var rightY_y2 = (r + cirWidth * 2) * Math.sin(2.265 * Math.PI);
+        ctx.moveTo(rightX_x1, rightY_y1);
+        ctx.lineTo(rightX_x2, rightY_y2);
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 字体
+        ctx.beginPath();
+        ctx.font = "normal 14px Arical";
+        ctx.fillStyle = "#fff"
+
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText(max_wind, rightX_x2 + 10, rightY_y2 + 5);
+
+        ctx.font = "normal 8px Arical";
+        ctx.fillStyle = "#fff"
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText("℃", rightX_x2 + 25, rightY_y2 + 5);
+
+        // ==== 当前温度
+        ctx.font = "normal 14px Arical";
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText("当前温度", 0, rightY_y2 + 5);
+
+
+        // 显示温度
+        ctx.font = "normal 60px Arical";
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        console.log('now_wind===========', typeof (now_wind) == "undefined")
+        if (now_wind != 0 && typeof (now_wind) != 'undefined') {
+            ctx.fillText(now_wind, 0, 0);
+        } else {
+            ctx.fillText("--", 0, 0);
+        }
+        ctx.font = "normal 14px Arical";
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText("℃", (r - cirWidth * 3) * Math.cos(1.75 * Math.PI), (r - cirWidth * 5) * Math.sin(1.75 * Math.PI));
+        // 显示进度
+        ctx.beginPath();
+        ctx.lineWidth = cirWidth + 1;
+        ctx.strokeStyle = "#fff";
+        ctx.arc(0, 0, r, cirMin * Math.PI, cirMax * Math.PI, false);
+        ctx.stroke();
+
+        if (now_wind != 0 && typeof (now_wind) != 'undefined') {
+            ctx.beginPath();
+            ctx.arc(x1, y1, 10, 0, Math.PI * 2, false);
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+
+
+    var x1;
+    $("#canvas").on('touchmove', function (event) {
+
+        event.preventDefault();
+
+        //标准的获取鼠标点击相对于canvas画布的坐标公式
+        var x2 = event.touches[0].pageX - canvas.getBoundingClientRect().left;
+        var y2 = event.touches[0].pageY - canvas.getBoundingClientRect().top;
+
+        if (Math.abs(xiaoyuanX - x2) > 10 || Math.abs(xiaoyuanY - y2) > 10) {
+            return
+        }
+
+
+        // return;
+        // if(x1 < x){
+        //     // 右滑
+        //     console.log("========================= 右滑");
+        //     xiaoyunaCir =  xiaoyunaCir + 1 <= max ?  xiaoyunaCir + 1 : max;
+        //     getCanvasFn(90, 10, min, max, xiaoyunaCir);
+        // }else if(x1 > x){
+        //     // 左滑
+        //     xiaoyunaCir = xiaoyunaCir - 1 >= min ? xiaoyunaCir - 1 : min;
+        //     getCanvasFn(90, 10, min, max, xiaoyunaCir);
+        //     console.log("========================= 左滑");
+        // }
+        // x1 = x;
+
+        var mind = ((max - min) / 2 - xiaoyunaCir) < 0 ? -1 : 1;
+        if (mind != 0 && (xiaoyunaCir < 20 || xiaoyunaCir > 60)) {
+            // 左边、右边
+            if ((y2 - y1) * mind < 0) {
+                // 添加
+                console.log("====================添加")
+                xiaoyunaCir = xiaoyunaCir + 1 <= max ? xiaoyunaCir + 1 : max;
+                getCanvasFn(90, 10, min, max, xiaoyunaCir);
+            } else {
+                console.log('====================减少')
+                // 减少
+                xiaoyunaCir = xiaoyunaCir - 1 >= min ? xiaoyunaCir - 1 : min;
+                getCanvasFn(90, 10, min, max, xiaoyunaCir);
+            }
+        } else {
+            // 中间
+            if (x2 - x1 > 0) {
+                xiaoyunaCir = xiaoyunaCir + 1 <= max ? xiaoyunaCir + 1 : max;
+                getCanvasFn(90, 10, min, max, xiaoyunaCir);
+            } else {
+                xiaoyunaCir = xiaoyunaCir - 1 >= min ? xiaoyunaCir - 1 : min;
+                getCanvasFn(90, 10, min, max, xiaoyunaCir);
+            }
+        }
+        x1 = x2;
+        y1 = y2;
+    });
+    $("#canvas").on('touchstart', function (event) {
+        event.preventDefault();
+        var x = event.touches[0].pageX - canvas.getBoundingClientRect().left;
+        var y = event.touches[0].pageY - canvas.getBoundingClientRect().top;
+        if (Math.abs(xiaoyuanX - x) > 10 || Math.abs(xiaoyuanY - y) > 10) {
+            return
+        }
+        x1 = x;
+        y1 = y;
+    })
+</script>
+
+</html>
