@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="400" height="400"></canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		context.translate(200,200);
+		var img = new Image();
+		img.src = "../../PPT/归档(1)/C6F893C217716100C740EE1A54E8919C.png";
+		img.onload = function(){
+			canvas.width = img.width;
+			canvas.height = img.height;
+			
+			imgRemove();
+		}
+		var y = 0;
+		function imgCont(y){
+			context.drawImage(img,0,y);
+			context.drawImage(img,0,canvas.height+y);
+		}
+		function imgRemove(){
+			context.clearRect(0,0,canvas.width,canvas.height);
+			imgCont(y);
+			y --;
+			if(Math.abs(y) > canvas.height){
+				console.log("jaj")
+				y = 0;
+			}
+			window.requestAnimationFrame(imgRemove);
+		}
+	</script>

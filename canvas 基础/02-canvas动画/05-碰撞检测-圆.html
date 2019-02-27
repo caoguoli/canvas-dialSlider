@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500"></canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		function Rect(x,y,r,color,speedX,speedY){
+			this.x = x;
+			this.y = y;
+			this.r = r;
+			this.color = color;
+			this.speedX = speedX;
+			this.speedY = speedY;
+		}
+		Rect.prototype.draw = function(){
+			context.beginPath();
+			context.fillStyle = this.color;
+			context.arc(this.x,this.y,this.r,0,Math.PI*2);
+			context.fill();
+		}
+		Rect.prototype.move = function(){
+			this.x += this.speedX;
+			this.y += this.speedY;
+			// 碰壁检测
+			if(this.x < this.r || this.x + this.r> canvas.width){
+				this.speedX *= -1;
+			}
+			if(this.y < this.r || this.y + this.r> canvas.height){
+				this.speedY *= -1;
+			}
+		}
+		
+		var rect1 = new Rect(20,20,20,"red",2,5);
+		var rect2 = new Rect(480,20,20,"blue",2,3);
+		function act(){
+			context.clearRect(0,0,canvas.width,canvas.height);
+			rect1.draw();
+			rect1.move();
+			
+			rect2.draw();
+			rect2.move();
+			
+			// 碰撞检测
+			if(Math.pow(rect1.r+rect2.r,2) > Math.pow(rect1.x - rect2.x,2)+Math.pow(rect1.y - rect2.y,2)){
+				console.log("123")
+				rect1.speedX *= -1;
+				rect1.speedY *= -1;
+				rect2.speedX *= -1;
+				rect2.speedY *= -1;
+			}
+			window.requestAnimationFrame(act);
+		}
+		act();
+	</script>
+</html>

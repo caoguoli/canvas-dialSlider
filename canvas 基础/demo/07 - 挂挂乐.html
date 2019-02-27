@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>刮刮乐</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        canvas {
+            border: 1px solid darkgray;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="./other/a.jpg" alt="" />
+    <canvas id="mycanvas" width="240" height="360"></canvas>
+</body>
+<script>
+
+    /*
+        先画图片 （目标图）
+        鼠标移动，画粗线 （源图）
+        重叠的地方 ：设置图形组合方式 - 只显示目标图，不显示源图
+
+        面积大于 0.7 则全透明
+    */
+    var canvas = document.getElementById("mycanvas");
+    var ctx = canvas.getContext("2d");
+
+    // 遮罩图
+    ctx.beginPath();
+    ctx.fillStyle = "gainsboro";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 设置图形组合方式：只显示目标图，不显示源图
+    ctx.globalCompositeOperation = "destination-out";
+
+    canvas.onmousedown = function (ev) {
+        var ev = ev || window.event;
+        var x = ev.clientX - canvas.offsetLeft;
+        var y = ev.clientY - canvas.offsetTop;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        canvas.onmousemove = function (ev) {
+            var ev = ev || window.event;
+            var xx = ev.clientX - canvas.offsetLeft;
+            var yy = ev.clientY - canvas.offsetTop;
+
+            ctx.lineTo(xx, yy);
+            ctx.lineWidth = 20;
+            ctx.stroke();
+
+            var imageData2 = ctx.getImageData(0, 0, 240, 360);  // 获取canvas 向上数据
+            var imageDataTou2 = 0;
+            for (var i = 0; i < imageData2.data.length; i += 4) { // rgba
+                if (imageData2.data[i + 3] == 0) {  // 透明度为 0 的所有坐标
+                    imageDataTou2++;
+                }
+            }
+
+            if((imageDataTou2/(imageData2.data.length/4)) >= 0.5){
+                console.log("我要透明了")
+
+                // 方式一：将 imageData2 的像素中 ，透明度都变为 0 
+                // for(var i=0;i<imageData2.data.length;i+=4){
+                //     imageData2.data[i+3] = 0;
+                // }
+                // ctx.putImageData(imageData2,0,0);
+                
+                // 方式二：源图变为：canvas 大小。
+                ctx.rect(0,0,canvas.width,canvas.height);     
+                ctx.fill();
+
+            }
+        }
+    }
+    canvas.onmouseup = function () {
+        canvas.onmousemove = "";
+    }
+</script>
+
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="" height="">您的浏览器不支持canvas</canvas>
+		
+		<audio src="audio/game_music.mp3"  loop>您的浏览器不支持audio标签</audio>
+		<audio src="audio/enemy1_down.mp3" preload>您的浏览器不支持audio标签</audio>
+	</body>
+	<script type="text/javascript">
+		// ***************************  音乐
+			var audioBegin = document.getElementsByTagName("audio");
+			
+		// 对象：主机、敌机、子弹
+		// 方法：画、动
+		// 碰撞：主机碰撞敌机、子弹碰撞敌机(像素碰撞 -- 性能问题(选做))
+		// 玩法、声音(选做)
+		
+		var grade = 0;
+		var imgArr = {
+			"bg":"img/background.png",
+			"bullet2":"img/bullet2.png",
+			"herofly":"img/herofly.png",
+			"enemy1":"img/enemy1.png",
+			"enemy2":"img/enemy2.png",
+			"enemy3":"img/enemy3.png"
+		}
+	// 图片预加载
+		// 图片数量
+		var imgLength = 0;
+		for(var i in imgArr){
+			imgLength ++;
+		}
+		// 图片放入数组
+		var imgNum = 0;
+		var loadArr = {};
+		for(let i in imgArr){
+			var img = new Image();
+			img.src = imgArr[i];
+			img.onload = function(){
+				loadArr[i] = this;
+				imgNum++;
+				if(imgNum >= imgLength){
+					main(loadArr);
+				}
+			}
+		}
+
+		function main(loadArr){
+			var canvas = document.getElementById("mycanvas");
+			var context = canvas.getContext("2d");
+			canvas.width = loadArr.bg.width;
+			canvas.height = loadArr.bg.height;
+			
+			// **************  背景图
+			function BackImg(obj,bgSpeedY){
+				this.obj = obj;
+				this.bgSpeedY = bgSpeedY;
+				this.x = 0;
+				this.y = 0;
+			}
+			BackImg.prototype.draw = function(){
+				context.drawImage(this.obj,this.x,this.bgSpeedY);
+				context.drawImage(this.obj,this.x,canvas.height+this.bgSpeedY);
+			}
+			BackImg.prototype.move = function(){
+				if(bgSpeedY <= -canvas.height){
+					bgSpeedY = 0;
+				}
+			}
+			
+			// **************** 英雄机
+			function Herofly(x,y,obj,blood){
+				this.x = x;
+				this.y = y;
+				this.obj = obj;
+				this.w = obj.width/5;
+				this.h = obj.height;
+				// 牺牲属性
+				this.blood = blood;
+				this.num = 0;
+				this.index = 0;
+				// 键盘移动
+				this.dis = "";
+			}
+			Herofly.prototype.draw = function(){
+				context.drawImage(this.obj,this.index*this.w,0,this.w,this.h,this.x,this.y,this.w,this.h);
+			}
+			Herofly.prototype.die = function(){
+				this.blood --;
+				this.num ++;
+				if(this.blood < 0){
+					if(this.num%20 == 0){
+						this.index ++;
+					}
+				}
+			}
+			Herofly.prototype.move = function(){			
+				// 英雄机移动
+				switch(this.dis){
+						case "left":
+							if(newHerofly.x > 0){
+								newHerofly.x -= 10;
+								heroX -= 10;
+								this.dis = "";
+								break;
+								
+							}else{
+								break;
+							}
+						case "right":
+						 if(newHerofly.x <canvas.width - newHerofly.w){
+						 		newHerofly.x += 10;
+						 		heroX += 10;
+						 		this.dis = "";
+								break;
+						 }else{
+						 	break;
+						 }
+						 case "down":
+							if(newHerofly.y > 0){
+								newHerofly.y -= 10;
+								heroY -= 10;
+								this.dis = "";
+								break;
+							}else{
+								break;
+							}	
+						case "up":
+							if(newHerofly.y < canvas.height - newHerofly.h){
+								newHerofly.y += 10;
+								heroY += 10;
+								this.dis = "";
+								break;
+							}
+					}
+			}
+			
+			// ************ 子弹 
+			function Bullet(x,y,obj,speedY){
+				this.x = x;
+				this.y = y;
+				this.obj = obj;
+				this.w = obj.width;
+				this.h = obj.height;
+				this.speedY = speedY;
+			}
+			Bullet.prototype.draw = function(){
+				context.drawImage(this.obj,this.x,this.y);
+			}
+			Bullet.prototype.move = function(){
+				this.y -= this.speedY;	
+			}
+			Bullet.prototype.isClear = function(){
+				if(this.y <0){
+					return true;
+				}else{
+					return false;
+				}
+			}
+			
+			// ***********  敌机
+			function random(min,max){
+				return parseInt(Math.random()*(max - min)+min);
+			}
+			function Enemy(x,y,obj,blood,speedY,enemyImageNum){
+				this.x = x;
+				this.y = y;
+				this.enemyImageNum = enemyImageNum;
+				this.w = obj.width/enemyImageNum;
+				this.h = obj.height;
+				this.obj = obj;
+				
+				this.speedY = speedY;  // 移动距离
+				
+				// 射中
+				this.num = 0;
+				this.speed = 0;
+				this.blood = blood;  // 射中几次死
+			}
+			Enemy.prototype.draw = function(){
+				context.drawImage(this.obj,this.num*this.w,0,this.w,this.h,this.x,this.y,this.w,this.h);
+			}
+			Enemy.prototype.move = function(){
+				this.y += this.speedY;
+			}
+			Enemy.prototype.die = function(){
+				if(this.blood == 0){
+					this.speed ++;
+					if(this.speed%15 == 0){
+					
+						this.num ++; 
+					}			
+				}
+			}
+			Enemy.prototype.isClear = function(){
+				if(this.y >= loadArr.bg.height){
+					return true;
+				}else{
+					return false;
+				}
+			}
+			
+			// 碰撞检测
+			function Rect(x,y,w,h){
+				this.x = x;
+				this.y = y;
+				this.w = w;
+				this.h = h;
+			}
+			function overLap(newObj1,newObj2){
+				var min1X = newObj1.x;
+				var max1X = newObj1.x + newObj1.w;
+				var min1Y = newObj1.y;
+				var max1Y = newObj1.y + newObj1.h;
+				
+				var min2X = newObj2.x;
+				var max2X = newObj2.x + newObj2.w;
+				var min2Y = newObj2.y;
+				var max2Y = newObj2.y + newObj2.h;
+				
+				var minX = Math.max(min1X,min2X);
+				var maxX = Math.min(max1X,max2X);
+				var minY = Math.max(min1Y,min2Y);
+				var maxY = Math.min(max1Y,max2Y);
+				
+				var obj = new Rect(minX,minY,(maxX-minX),(maxY-minY));
+				if(maxX > minX && maxY > minY){
+					return {
+						judge:true,
+						rect:obj
+					}
+				}else{
+					return{
+						judge:false
+					}
+				}
+			}
+			
+			// 实列化英雄机
+			var heroX = (loadArr.bg.width - loadArr.herofly.width/5)/2;
+			var heroY = loadArr.bg.height - loadArr.herofly.height;
+			var newHerofly = new Herofly(heroX,heroY,loadArr.herofly,100);
+			// 英雄机是否结束
+			var heroBoll = false;
+			// 游戏是否结束
+			var actBool = true;	
+			
+			// 背景图移动属性
+			var bgSpeedY = 0; 
+			
+			// 子弹属性
+			var bulletArr = [];  // 子弹容器
+			var bulletSpeed = 0; // 子弹移动速度
+			
+			// 敌机属性
+			var enemyArr = [];     // 敌机容器
+			var crashHero = true;
+			
+			// 音乐属性
+			var musicGameover = true;
+	
+// ************************************************************************	
+			
+			function act(){
+				// 清除画布
+				context.clearRect(0,0,canvas.width,canvas.height);
+		
+				// 背景图重汇
+				bgSpeedY --; 
+				var newBackImg = new BackImg(loadArr.bg,bgSpeedY);
+				newBackImg.draw();
+				newBackImg.move();
+				
+				// 敌机重汇
+				if(bulletSpeed%100 == 0){
+					var enemyImg = random(1,11);
+					if(enemyImg <= 5){
+						 randomEnemyImage = loadArr.enemy1;
+						 enemyImageNum = 5;	
+						 speedY = 1;
+					}else if(enemyImg > 5 && enemyImg <8){
+						randomEnemyImage = loadArr.enemy2;
+						enemyImageNum = 6;
+						speedY = 0.7;
+					}else{
+						randomEnemyImage = loadArr.enemy3;
+						enemyImageNum = 10;
+						speedY = 0.5; 
+					}
+					enemyX = random(0,canvas.width-randomEnemyImage.width/enemyImageNum);
+					var newEnemy = new Enemy(enemyX,0,randomEnemyImage,2,speedY,enemyImageNum);
+					enemyArr.push(newEnemy);			
+				}
+				
+				// 实列化敌机
+				var enemyBool = true;
+				for(var i=0;i<enemyArr.length;i++){
+					enemyArr[i].draw();
+					enemyArr[i].move();
+					enemyArr[i].die();
+					if(enemyArr[i].isClear()){
+						enemyArr.splice(i,1);
+					}
+				}
+				
+				// 英雄机重汇
+				newHerofly.draw();
+				newHerofly.move();
+				
+				// 英雄机死	
+				for(var i=0;i<enemyArr.length;i++){
+					// 像素碰撞
+					var res1 = overLap(newHerofly,enemyArr[i]);
+					if(res1.judge){
+						// 清空画布
+						context.clearRect(0,0,canvas.width,canvas.height);
+						// 画其他
+						newBackImg.draw();
+						enemyArr[i].draw();
+						// 画英雄机
+						newHerofly.draw();
+						// 获取英雄机像素点
+						var imageDataHero = context.getImageData(res1.rect.x,res1.rect.y,res1.rect.x+res1.rect.w,res1.rect.y+res1.rect.h);
+						// 清空画布
+						context.clearRect(0,0,canvas.width,canvas.height);
+						// 画其他
+						newBackImg.draw();
+						newHerofly.draw();
+						// 画敌机
+						enemyArr[i].draw();
+						// 获取敌机像素点
+						var imagDataEnemy = context.getImageData(res1.rect.x,res1.rect.y,res1.rect.x+res1.rect.w,res1.rect.y+res1.rect.h);
+						// 检测是否像素碰撞
+						for(var k=0;k<imageDataHero.data.length;i+=4){
+							if(imageDataHero.data[i+3] > 0 && imagDataEnemy.data[i+3] > 0){
+								// 像素碰撞
+								// 加入音乐
+								audioBegin[0].src = "audio/game_over.mp3";
+								audioBegin[0].loop = "";
+								
+								for(var i=0;i<6;i++){
+									newHerofly.die();
+									if(i == 5){
+										heroBoll = true;
+									}
+								}
+								if(heroBoll){
+									break;
+								}
+							}
+						}
+						if(heroBoll){
+							setTimeout(function(){
+								actBool = false;
+							},3000);
+						}
+					}				
+				}
+				
+				// 子弹重汇
+				bulletSpeed ++;
+				if(bulletSpeed%20 == 0){
+					var newBullet = new Bullet(heroX+10,heroY-10,loadArr.bullet2,2);
+					bulletArr.push(newBullet);
+				}
+				for(var i=0;i<bulletArr.length;i++){
+					bulletArr[i].draw();
+					bulletArr[i].move();
+					if(bulletArr[i].isClear()){
+						bulletArr.splice(i,1);
+					}
+					
+					 // 子弹和敌机碰撞
+					for(var j=0;j<enemyArr.length;j++){
+						if (bulletArr[i].x < enemyArr[j].x + enemyArr[j].w && 
+							bulletArr[i].x + bulletArr[i].w > enemyArr[j].x &&
+							bulletArr[i].y < enemyArr[j].y + enemyArr[j].h &&
+							bulletArr[i].y + bulletArr[i].h > enemyArr[j].y){
+							enemyArr[j].blood --;
+							// 添加音乐 
+//							if(enemyArr[j].enemyImageNum == 5){
+//								console.log("1");
+////								audioBegin[1].src = "audio/enemy1_down.mp3";
+////								audioBegin[1].autoplay = "autoplay";
+//							}else if(enemyArr[j].enemyImageNum == 6){
+//								console.log("2");
+//	
+//							}else{
+//								console.log("3");
+//							}
+							
+							
+//							bulletArr.splice(i,1);
+							if(enemyArr[j].blood <=0){
+								enemyArr[j].blood = 0;
+								if(enemyArr[j].num > enemyArr[j].enemyImageNum){
+									if(enemyBool){
+										enemyArr.splice(j,1);
+										grade ++;
+										enemyBool = false;
+									}	
+								}
+							}
+						}				
+					}
+				}
+				
+				// 英雄机移动
+				document.onkeydown = function(ev){
+					var evObj = ev || window.event;
+					switch(evObj.keyCode){
+						case 37 :
+							newHerofly.dis = "left";
+							break;
+						case 38:
+							newHerofly.dis = "down";
+							break;
+						case 39:
+							newHerofly.dis = "right";
+							break;
+						case 40:
+							newHerofly.dis = "up";
+							break;
+						default:
+							break;
+					}
+				}
+	
+				// 英雄机死，结束游戏
+				if(actBool){
+					window.requestAnimationFrame(act);
+				}
+				if(!actBool){
+					alert("分数为"+grade);
+				}
+			}
+			act();
+		}
+	</script>
+</html>

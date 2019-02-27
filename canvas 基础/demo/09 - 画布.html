@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+				}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500"></canvas>
+	</body>
+	<script type="text/javascript">
+		var canvans = document.getElementById("mycanvas");
+		var context = canvans.getContext("2d");
+		
+		// 按下、移动
+		canvans.onmousedown = function(ev){
+			var evObj = ev || window.event;
+			var x1 = ev.clientX - canvans.offsetLeft;
+			var y1 = ev.clientY - canvans.offsetTop;
+			context.beginPath();
+			context.moveTo(x1,y1);
+			context.lineWidth = 20;
+			context.strokeStyle = "cornflowerblue";
+			canvans.onmousemove = function(ev){
+				var evObj = ev || window.event;
+				var x2 = ev.clientX - canvans.offsetLeft;
+				var y2 = ev.clientY - canvans.offsetTop;
+				context.lineTo(x2,y2);
+				context.stroke();
+			}
+		}
+		// 在整个文档抬起，都会结束画布
+		document.onmouseup = function(ev){
+			canvans.onmousemove = "";	
+		}
+	</script>
+</html>

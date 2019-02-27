@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>验证码</title>
+		<style type="text/css">
+			canvas{
+				border:1px solid #000;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="100" height="20">
+			
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		// 随机字符(透明度、大小、位置)、随机背景色 (取浅色 200-250)
+		// 干扰项：
+			//	10个左右的随机干扰圆（半径随机、位置随机 :有大部分在画布上）
+			//	10个左右的随机干扰线（长度随机、位置随机）
+			
+		var strStore = "abcdefghijklmnopqrstuvwxyzABCDEFJHIJKLMNOPQRSTUVWXYZ0123456789";
+		// 随机函数
+		function randNum(min,max){
+			return parseInt(Math.random()*(max - min)) + min;
+		}
+		
+//		var str = strStore[randNum(0,strStore.length)];
+//		console.log(str);
+		
+		// 随机颜色
+		
+		
+		
+		// 一、随机背景颜色
+		var colors = `rgb(${randNum(200,255)},${randNum(200,255)},${randNum(200,255)})`;
+		context.beginPath();
+		context.fillStyle = colors;
+		context.fillRect(0,0,canvas.width,canvas.height);
+		for(var i=0;i<5;i++){
+		// 字体
+			// 随机字符
+			var str = strStore[randNum(0,strStore.length)];
+			context.beginPath();
+			// 随机字体Y位置
+			var fontY = randNum(15,20);
+			// 随机大小
+			var fontSize = randNum(10,20);
+			// 随机透明度
+			var fontopac = Math.random()*(1-0.5)+0.5;
+			context.font = fontSize+"px Arial";
+			context.fillStyle = "rgba(0,0,0,"+fontopac+")" ;
+			context.fillText(str,(i+1)*15,fontY);
+		}
+		
+		// 干扰项：
+			//	10个左右的随机干扰圆（半径随机、位置随机 :有大部分在画布上）
+			//	10个左右的随机干扰线（长度随机、位置随机）
+		var roundNum = randNum(7,10);
+		for(var i=0;i<roundNum;i++){
+			// 半径随机
+			var radius = `${randNum(10,90)},${randNum(3,17)},${randNum(5,13)},0,Math.PI`;
+			var rColors = `rgb(${randNum(100,255)},${randNum(100,255)},${randNum(100,255)})`;
+			context.beginPath();
+			context.strokeStyle = rColors;
+			context.arc(randNum(10,90),randNum(3,17),randNum(5,13),0,Math.PI*2);
+			context.stroke();
+			
+			context.beginPath();
+			context.moveTo(randNum(0,100),randNum(0,100));
+			context.lineTo(randNum(0,20),randNum(0,20));
+			context.strokeStyle = `rgb(${randNum(100,255)},${randNum(100,255)},${randNum(100,255)})`;
+			context.stroke();
+			
+		}
+		
+		// 清空画布
+//		context.clearRect(0,0,canvas.width,canvas.height);
+	</script>
+</html>

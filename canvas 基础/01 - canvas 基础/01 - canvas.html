@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas 01 </title>
+    <style>
+        #canvas {
+            border: 1px solid;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="400" height="400">
+        对不起，您的浏览器版本过低，点击<a href="javascript:void(0)">下载</a>
+    </canvas>
+</body>
+<script>
+    // 单位：px
+
+let canvas = document.getElementById('canvas'); // 获取节点
+let ctx = canvas.getContext('2d');   // 获取上下文
+
+// 线
+ctx.beginPath();          // 新建图层（在之前的坐标基础上）
+ctx.moveTo(20, 10);        // 线：开始坐标
+ctx.lineTo(20, 350);       // 线：结束坐标
+ctx.strokeStyle = '#000'; // 颜色
+ctx.lineWidth = 20;       // 线宽
+ctx.lineCap = 'round';    // 线帽
+ctx.globalAlpha = 0.5     // 透明度
+ctx.stroke();             // 渲染（笔触：线性）
+
+ctx.clearRect(0, 0, 400, 400);
+
+//  三角形
+ctx.beginPath();
+ctx.moveTo(100, 0);
+ctx.lineTo(0, 200);
+ctx.lineTo(200, 200);
+ctx.closePath();           // 闭合路径
+ctx.lineWidth = 2;
+ctx.strokeStyle = 'pink';  // 边框渲染
+ctx.stroke();
+
+ctx.moveTo(300, 0);
+ctx.lineTo(400, 200);
+ctx.lineTo(200, 200);
+ctx.closePath();           // 闭合路径
+ctx.fillStyle = 'red';     // 内容填充渲染
+ctx.fill();
+
+ctx.clearRect(0, 0, 400, 400);
+
+//  四边形
+ctx.beginPath();
+ctx.fillStyle = 'red';
+ctx.fillRect(20, 20, 150, 100);   //左上角坐标 X , 左上角坐标 Y , 宽 , 高
+ctx.fill();
+
+ctx.beginPath();
+ctx.strokeStyle = 'yellow';
+ctx.strokeRect(200, 20, 150, 100); //左上角坐标 X , 左上角坐标 Y , 宽 , 高
+ctx.stroke();
+
+ctx.beginPath();
+ctx.fillStyle = 'blue';
+ctx.rect(20, 200, 150, 100);       //左上角坐标 X , 左上角坐标 Y , 宽 , 高
+ctx.fill()
+
+ctx.beginPath();
+ctx.strokeStyle = 'green';
+ctx.rect(200, 200, 150, 100);      //左上角坐标 X , 左上角坐标 Y , 宽 , 高
+ctx.stroke();
+
+
+// if(ctx.isPointInPath(210,210)){
+//     console.log('在图形内')
+// }else{
+//     console.log('不在图形内')
+// }
+
+ctx.clearRect(0, 0, 400, 400);
+
+// 圆
+ctx.beginPath();
+ctx.fillStyle = 'red';                             
+ctx.arc(100, 100, 80, 0, 2 * Math.PI, false);   // 圆心坐标 X , 圆心坐标 Y , 半径 , 开始角度 , 结束角度 
+ctx.fill();                         // fill ：填充渲染，圆
+
+ctx.beginPath();
+ctx.strokeStyle = 'yellow';          
+ctx.arc(300, 100, 80, 0, 1.5 * Math.PI, false);
+ctx.stroke();                      // stroke：边框渲染，圆弧
+
+ctx.clearRect(0,0,400,400);
+
+// 字体
+ctx.beginPath();
+ctx.moveTo(0,100);
+ctx.lineTo(200,100);
+ctx.moveTo(0,300);
+ctx.lineTo(200,300);
+ctx.moveTo(100,0);
+ctx.lineTo(100,400);
+ctx.stroke();
+
+ctx.font = "normal 30px Arical";    //字体大小、样式
+ctx.textBaseline = 'middle';        //垂直对齐方式
+ctx.textAlign = 'center';           //水平对齐方式
+ctx.fillText('你好世界',100,100);    //文字内容：填充
+
+var grd = ctx.createLinearGradient(0,0,500,500);  //线性渐变 ： 启始坐标 X , 启始坐标 Y , 结束坐标 X , 结束坐标 Y 
+var grd = ctx.createRadialGradient(250,250,100,250,250,200,250,250,250);  //径向渐变：起始坐标 X , 起始坐标 Y , 半径 R , ...
+grd.addColorStop(0,"blue");
+grd.addColorStop(0.5,"red");
+grd.addColorStop(1,"yellow");
+ctx.strokeStyle = grd;
+ctx.strokeText('你好世界',100,300);  //文字内容：边框渲染
+
+// 阴影
+ctx.clearRect(0,0,400,400);
+ctx.shadowColor = '#000';     //阴影颜色
+ctx.shadowBlur = 6;           //阴影模糊程度
+ctx.shadowOffsetX = 5;        //阴影偏移 X 轴
+ctx.shadowOffsetY = 2;        //阴影偏移 Y 轴
+ctx.fillText('hellow',200,200);
+
+
+
+</script>
+
+</html>

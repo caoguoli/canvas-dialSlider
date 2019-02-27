@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>小方块碰壁反弹</title>
+	</head>
+	<style type="text/css">
+		canvas{
+			border:1px solid red;
+		}
+	</style>
+	<body>
+		<canvas id="mycanvas" width="500" height="600">
+			您的浏览器不支持canvas
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		// 球的构造函数
+		class Rect{
+			constructor(x,y,r,colors,speedx,speedy){
+				this.x = x;
+				this.y = y;
+				this.r = r;
+				this.colors = colors
+				this.speedx = speedx;
+				this.speedy = speedy;
+			}
+			draw(){
+				context.beginPath();
+				context.fillStyle = this.colors;
+				context.arc(this.x,this.y,this.r,0,Math.PI*2);
+				context.fill();
+			}
+			move(){
+				this.x += this.speedx;
+				this.y += this.speedy;
+				// 碰壁检测
+				if(this.x < this.r || this.x > canvas.width - this.r){
+					this.speedx *= -1;
+				}
+				if(this.y < this.r || this.y > canvas.height - this.r){
+					this.speedy *= -1;
+				}
+			}
+		}
+		
+		// 随机数
+		function randNum(min,max){
+			return parseInt(Math.random()*(max-min)+min);
+		}
+		function randColor(){
+			return "rgb("+randNum(0,256)+","+randNum(0,256)+","+randNum(0,256)+")";
+		}
+		
+		var arr = [];  // 画100 个球
+		for(var i=0;i<100;i++){
+			var r = randNum(5,20);
+			var x = randNum(r,canvas.width-r);
+			var y = randNum(r,canvas.height-r);
+			var speedx = randNum(1,10);
+			var speedy = randNum(1,10);
+			var color = randColor();
+			// 实列化球
+			newRect = new Rect(x,y,r,color,speedx,speedy);
+			arr.push(newRect);
+		}
+		// 重复调用
+		function act(){
+			context.clearRect(0,0,canvas.width,canvas.height);
+			for(var i=0;i<arr.length;i++){
+				arr[i].draw();
+				arr[i].move();	
+			}
+			window.requestAnimationFrame(act);
+		}
+		act();
+	</script>
+</html>

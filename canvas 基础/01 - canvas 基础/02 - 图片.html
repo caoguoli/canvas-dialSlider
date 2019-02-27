@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500">
+			您的浏览器不支持canvas
+		</canvas>
+	</body>
+	<!-- 图片转 base64 -->
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		var img = new Image();
+		img.src = "../other/a.jpg";
+		// 图片加载完成后再画
+		img.onload = function(){
+			// 方式一：参数3 -- 放入画布位置(x,y);
+			context.drawImage(img,0,0); // 图片对象，图片位置X,图片位置Y
+			// 方式二:参数5 -- 放入画布位置(x,y),图片大小(x,y)  -- 图片可能会失帧
+//			context.drawImage(img,0,0,300,200); // 图片对象，图片位置X,图片位置Y,图片大小X,图片大小
+			// 方式三:裁剪   图片对象，参数9 -- 原图像上位置(x,y),原图裁切大小(x,y),放入画布位置(x,y),图片大小(x,y)(x,y)
+//			context.drawImage(img,50,50,100,100,30,30,100,100);
+
+			// 获取所有像素点 -- 
+			// 参数4：获取起始位置(x,y),获取结束位置(x,y)  
+			var imageData = context.getImageData(0,0,500,500);
+			console.log(imageData);
+
+			
+			for(var i=0;i<imageData.data.length;i+=4){
+				var r = imageData.data[i];
+				var g = imageData.data[i+1];
+				var b = imageData.data[i+2];
+				var gray = (r+b+g)/3;
+				
+				// 灰度处理 gray
+				imageData.data[i] = gray;
+				imageData.data[i+1] = gray;
+				imageData.data[i+2] = gray;
+				
+				// 反色处理
+//				imageData.data[i] = 255 - r;
+//				imageData.data[i+1] = 255 - g;
+//				imageData.data[i+2] = 255 - b;
+
+				// 灰度反色处理
+//				imageData.data[i] = 255 - gray;
+//				imageData.data[i+1] = 255 - gray;
+//				imageData.data[i+2] = 255 - gray;
+			}
+			// 将改好的像素重新放到画布上
+			context.putImageData(imageData,100,100);
+			
+		}	
+	</script>
+</html>

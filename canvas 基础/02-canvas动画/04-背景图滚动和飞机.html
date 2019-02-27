@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500">
+			您的浏览器不支持canvas
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		// 2张预加载
+		var arr = ["../../PPT/归档(1)/sky.png","../../PPT/归档(1)/3.png"];
+		var imgObj = {"sky":"../../PPT/归档(1)/sky.png","fly":"../../PPT/归档(1)/3.png"};
+		console.log(imgObj.length)    
+		// 统计对象长度  -- 对象没有 length
+		var imgNum = 0;
+		for(var i in imgObj){
+			imgNum ++;
+		}
+		
+		var num = 0;
+		var imageArr = {};
+		// 作用域问题：var 作用域只有一个，循环时前面的会覆盖后面的，一直都会只有最后一个的值。let可以在每次循环都是单独的作用域。
+		for(let i in imgObj){
+			var img = new Image();
+			img.src = imgObj[i];
+			img.onload = function(){
+				num ++;
+				imageArr[i] = this;
+				if(num >= imgNum){
+					main(imageArr);
+				}
+			}
+		}
+		
+//		for(var i=0;i<arr.length;i++){
+//			var img = new Image();
+//			img.src = arr[i];
+//			(function(i){
+//				img.onload = function(){
+//					num ++;
+//	//				imageArr.push(this);  // 按图片加载顺序 push 进入数组，加进入的始终是最后一张图(闭包) -- 解决方案 let 或者回调函数
+//					imageArr[i] = this;
+//					console.log(this);
+//					if(num >= arr.length){
+//						console.log("加载完成");			
+//						// 调用函数
+//						main(imageArr);
+//					}
+//				}
+//			}(i))
+//		}
+		
+		function main(imageArr){
+			console.log(imageArr);
+			canvas.width = imageArr.sky.width;
+			canvas.height = imageArr.sky.height;
+			x = 0;
+			act();
+			
+		}
+		function act(){
+			context.clearRect(0,0,canvas.width,canvas.height);
+			context.drawImage(imageArr.sky,x,0);
+			context.drawImage(imageArr.sky,canvas.width+x-1,0);
+			context.drawImage(imageArr.fly,100,100,150,100);
+			x --;
+			if(Math.abs(x) > canvas.width){
+				x = 0;
+			}
+			window.requestAnimationFrame(act);
+		}
+		
+//		var img = new Image();
+//		img.src = "../../PPT/归档(1)/sky.png";
+//	
+//		img.onload = function(){
+//			canvas.width = img.width;
+//			canvas.height = img.height;
+//			var x = 0;
+//			act();
+//			function act(){
+//				context.clearRect(0,0,canvas.width,canvas.height);
+//				context.drawImage(img,x,0);
+//				context.drawImage(img,canvas.width+x-1,0);
+//				x --;
+//				if(Math.abs(x) > canvas.width){
+//					x = 0;
+//				}
+//				window.requestAnimationFrame(act);
+//			}
+//		}
+	</script>
+</html>

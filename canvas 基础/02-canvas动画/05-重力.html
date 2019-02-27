@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500">
+			您的浏览器不支持canvas
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+			
+		function draw(y){
+			context.beginPath();
+			context.fillStyle = "red";
+			context.fillRect(x,y,50,50);
+		}
+		var y = 0;
+		var x = 0;
+		var speedX = 4;
+		draw(y);
+		function act(){
+			var t2 = new Date();
+			var t = (t2 - t1)/1000;
+			context.clearRect(0,0,canvas.width,canvas.height);
+			y = 9.8*Math.pow(t,2)*0.5*100;
+			x += speedX;
+			if(y > canvas.height - 50){
+				speedX = 0;
+				y = canvas.height - 50;
+				cancelAnimationFrame(res);
+			}
+			draw(y);
+			res = window.requestAnimationFrame(act);
+		}
+		canvas.onmousedown = function(){
+			// 开始t
+			t1 = new Date();
+			act();
+		}
+		
+		
+		context.font = "50px Arical";
+		
+	</script>
+</html>

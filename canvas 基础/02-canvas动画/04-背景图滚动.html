@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500">
+			您的浏览器不支持canvas
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		var img = new Image();
+		img.src = "../../PPT/归档(1)/sky.png";
+		
+		img.onload = function(){
+			canvas.width = img.width;
+			canvas.height = img.height;
+			var x = 0;
+			act();
+			function act(){
+				// 清除画布
+				context.clearRect(0,0,canvas.width,canvas.height);
+				// 画img图片
+				context.drawImage(img,x,0);
+				context.drawImage(img,canvas.width+x-1,0);
+				x --;
+				if(Math.abs(x) > canvas.width){
+					x = 0;
+				}
+				window.requestAnimationFrame(act);
+			}
+		}
+	</script>
+</html>

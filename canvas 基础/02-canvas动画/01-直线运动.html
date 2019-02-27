@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>小方块碰壁反弹</title>
+	</head>
+	<style type="text/css">
+		canvas{
+			border:1px solid red;
+		}
+	</style>
+	<body>
+		<canvas id="mycanvas" width="500" height="600">
+			您的浏览器不支持canvas
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		
+		var x =0;
+		var y=0;
+		var speedx = 2;
+		var speedy = 2;
+		function draw(x,y){
+			context.beginPath();
+			context.fillStyle = "aquamarine";
+			context.fillRect(x,y,50,50);
+		}
+		
+		function act(){
+			// 清空画布
+			context.clearRect(0,0,canvas.width,canvas.height);
+			// 跟新
+			x += speedx;
+			y += speedy;
+			// 碰壁判断
+			if(x < 0 || x > canvas.width - 50){
+				speedx *= -1;
+			}
+			if(y <0 || y > canvas.height - 50){
+				speedy *= -1;
+			}
+			// 重汇
+			draw(x,y);
+			window.requestAnimationFrame(act);
+		}
+		
+		// 执行递归动画函数
+		act();
+		
+		
+		
+	</script>
+</html>

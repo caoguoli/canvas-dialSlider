@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500">
+			您的浏览器不支持canvas
+		</canvas>
+		<button onclick="sub()"></button>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		context.beginPath();
+		context.fillStyle = "red";
+		context.fillRect(100,100,100,100);
+		
+		// canvas 转 base64 -- toDataURL
+function sub(){
+	var base64 = canvas.toDataURL();
+	console.log(base64);
+	var img = new Image();
+	img.src = base64;
+	document.getElementsByTagName("body")[0].appendChild(img);
+}
+	</script>
+</html>

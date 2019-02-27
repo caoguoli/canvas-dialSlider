@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="200" height="200">
+			80%
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		// 去空格
+		var percentText = canvas.innerHTML;
+		percentText = percentText.trim();
+		
+		// 去 % 
+		percentText = percentText.substr(0,percentText.length-1);
+		console.log(percentText);
+		// 转数值类型 ~~ 
+		console.log(typeof ~~percentText);
+		
+		// 画圆，圆的颜色为渐变
+		// font 字为百分比
+		// 根据百分比画圆
+		
+		// 圆
+		function ArcFn(grad){
+			this.fontSize = grad;
+			var grd = context.createLinearGradient(0,0,200,0);
+			grd.addColorStop(0,"yellow");
+			grd.addColorStop(0.3,"pink");
+			grd.addColorStop(0.5,"cadetblue")
+			grd.addColorStop(0.7,"greenyellow");
+			grd.addColorStop(1,"darkgoldenrod");
+			
+			var perfectSize = parseFloat(this.fontSize);
+			var addfontSize = 0;
+			var fontIntervalFn = setInterval(function(){
+				// 清空之前的画布
+				context.clearRect(0,0,canvas.width,canvas.height);  // 起始点，宽，高
+				
+				// 背景圆
+				context.beginPath();
+				context.arc(100,100,80,0,Math.PI*2);
+				context.strokeStyle = "#808080";
+				context.lineWidth = 15;
+				context.stroke();
+				
+				// 百分比圆
+				context.beginPath();
+				addfontSize += 0.01;
+				var arcMax = Math.PI*2*addfontSize + Math.PI*1.5;
+				context.arc(100,100,80,Math.PI*1.5,arcMax);
+				context.strokeStyle = grd;
+				context.lineCap = "round";
+				context.lineWidth = 15;
+				context.stroke();
+				
+				// 字 - 百分比
+				var fontBai = parseInt(addfontSize*100)+"%";
+				context.beginPath();
+				var fontContext =fontBai; 
+				context.font = "20px Arical";
+				context.textBasline = "middle";
+				context.textAlign = "center";
+				context.fillStyle = "#000000";
+				context.fillText(fontContext,100,100);
+	
+				if(addfontSize >= perfectSize){
+					clearInterval(fontIntervalFn);
+				}
+			},60);	
+		}
+		var newarcFn = new ArcFn("0.8");
+	</script>
+</html>

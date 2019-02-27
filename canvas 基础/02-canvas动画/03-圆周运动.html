@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="400" height="400"></canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		context.translate(200,200);
+		// 一、移动坐标系
+//		function draw(){
+//			context.beginPath();
+//			context.fillStyle = "red";
+//			context.arc(100,100,10,0,Math.PI*2);
+//			context.fill();
+//		}
+//		
+//		var everyPercnet = Math.PI/180;
+//		function act(){
+//			context.clearRect(0,0,canvas.width,canvas.height);
+//			context.rotate(everyPercnet);
+//			draw();
+//			window.requestAnimationFrame(act);
+//		}
+//		act();
+		
+	//*************************************************************	
+		// 二、画一小部分的弧
+		function arc(everyPercnet1,everyPercnet2){
+			context.beginPath();
+			context.strokeStyle = "red";
+			context.lineWidth = 18;
+			context.lineCap = "round";
+			context.arc(0,0,100,everyPercnet1,everyPercnet2);
+			context.stroke();
+		}
+		
+		var everyPercnet1 = 0;
+		var everyPercnet2 = Math.PI/360;
+		var every = Math.PI/180;
+		function act(){
+			everyPercnet1 += every;
+			everyPercnet2 += every;
+			context.clearRect(-200,-200,canvas.width,canvas.height);
+			arc(everyPercnet1,everyPercnet2);
+			window.requestAnimationFrame(act);
+		}
+		act();
+
+	// *************************************************************
+		// 三、三角函数
+			// 改变小球的位置
+		var everyPercent = Math.PI/90;
+		function draw(everyPercent){
+			context.beginPath();
+			var x = 100*Math.cos(everyPercent);
+			var y = 100*Math.sin(everyPercent);
+			context.arc(x,y,10,0,Math.PI*2);
+			context.fillStyle = "#0000FF";
+			context.fill();
+		}
+		
+		function act(){
+			context.clearRect(-200,-200,canvas.width,canvas.height);
+			
+			draw(everyPercent);
+			everyPercent += Math.PI/180;
+			window.requestAnimationFrame(act);
+		}
+		act();
+	</script>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500">
+			您的浏览器不支持vanvas
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		var play = new Image();
+		play.src = "./image/Play.png";
+		
+		function Rect(x,y,w,h){
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+		}
+		
+		var img = new Image();
+		img.src = "./image/Chat.png";
+		img.onload = function(){
+			context.beginPath();
+			context.drawImage(img,50,50);
+			var rect1 = new Rect(50,50,img.width,img.height);  // 只是保存img的
+			
+			canvas.onmousedown = function(){
+				 canvas.onmousemove = function(e){
+				 	var ev = e || window.event;
+				 	var x = ev.clientX - canvas.offsetLeft;
+				 	var y = ev.clientY - canvas.offsetTop;
+				 	context.clearRect(0,0,canvas.width,canvas.height);
+				 	context.drawImage(play,x,y);
+				 	// 实列化play的方块
+				 	var rect2 = new Rect(x,y,play.width,play.height);
+				 	context.drawImage(img,50,50);
+				 	// 判断方块碰撞的返回值 
+				 	var res = isCrash(rect1,rect2);
+				 	if(res.judge){
+				 		console.log('普通碰撞了')
+				 		// 进行像素碰撞，中间透明度为0时，说明碰撞上了
+				 		// 分别遍历碰撞区域的像素点
+				 		// 清空画布
+				 		// context.clearRect(0,0,canvas.width,canvas.height);
+				 		// 画蓝色图
+				 		context.drawImage(img,50,50);
+				 		// 获取蓝图像素点
+				 		var imageData1 = context.getImageData(res.rect.x,res.rect.y,res.rect.w,res.rect.h);
+				 		// 清空画布
+				 		context.clearRect(0,0,canvas.width,canvas.height);
+				 		// 画绿色图
+				 		context.drawImage(play,x,y);
+				 		// 获取绿图像素点
+				 		var imageData2 = context.getImageData(res.rect.x,res.rect.y,res.rect.w,res.rect.h);
+				 		// 画蓝色图
+				 		context.drawImage(img,50,50);
+						// console.log(imageData1,imageData2);
+						// 找一个点透明度：两个像素点的透明度都不为0，说明碰撞了
+				 		for(var i=0;i<imageData1.data.length;i+=4){
+				 			if(imageData1.data[i+3] > 0 && imageData2.data[i+3] > 0){
+				 				console.log("像素碰撞了");
+				 				break;  // 节约性能
+				 			}
+				 		}
+				 	}
+				 }
+			}
+			
+			canvas.onmouseup = function(){
+				canvas.onmousemove = "";
+			}
+		}
+		
+		
+		function isCrash(rect1,rect2){
+				var min1X = rect1.x;
+				var max1X = rect1.x + rect1.w;
+				var min2X = rect2.x;
+				var max2X = rect2.x + rect2.w;
+				
+				var min1Y = rect1.y;
+				var max1Y = rect1.y + rect1.h;
+				var min2Y = rect2.y;
+				var max2Y = rect2.y + rect2.h;
+				
+				// 假设碰撞出新的方块
+				var nminX = Math.max(min1X,min2X);
+				var nmaxX = Math.min(max1X,max2X);
+				
+				var nminY = Math.max(min1Y,min2Y);
+				var nmaxY = Math.min(max1Y,max2Y);
+				
+				// 创造对象
+				var obj = new Rect(nminX,nminY,(nmaxX-nminX),(nmaxY-nminY));
+				if(nmaxX > nminX && nmaxY>nminY){
+					return {
+						judge:true,
+						rect:obj
+					};
+				}else{
+					return {
+						judge:false
+					}
+				}
+			}
+		
+	</script>
+</html>

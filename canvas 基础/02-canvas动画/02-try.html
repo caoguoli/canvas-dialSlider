@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>小方块碰壁反弹</title>
+	</head>
+	<style type="text/css">
+		canvas{
+			border:1px solid red;
+		}
+	</style>
+	<body>
+		<canvas id="mycanvas" width="500" height="600">
+			您的浏览器不支持canvas
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		class Ball{
+			constructor(x,y,r,colors,speedX,spedY){
+				this.x = x;
+				this.y = y;
+				this.r = r;
+				this.colors = colors;
+				this.speedX = speedX;
+				this.speedY = speedY;
+			}
+			draw(){
+				context.beginPath();
+				context.fillStyle = this.colors;
+				context.arc(this.x,this.y,this.r,0,Math.PI*2);
+				context.fill();
+			}
+			move(){
+				this.x += this.speedX;
+				this.y += this.speedY;
+				// 碰撞检测
+				if(this.x < this.r || this.x + this.r > canvas.width){
+					this.speedX *= -1;
+				}
+				if(this.y < this.r || this.y + this.r >canvas.height){
+					this.speedY *= -1;
+				}
+			}
+		}
+		// 随机数
+		function randNum(min,max){
+			return parseInt(Math.random()*(max-min)+min);
+		}
+		function randColor(){
+			return "rgb("+randNum(0,256)+","+randNum(0,256)+","+randNum(0,256)+")";
+		}
+		
+		// 将实列小球放入数组
+		var arr = [];
+		for(var i=0;i<100;i++){
+			var r = randNum(10,30);
+			var x = randNum(r,canvas.width-r);
+			var y = randNum(r,canvas.height-r);
+			var colors = randColor();
+			var speedX = randNum(2,10);
+			var speedY = randNum(3,10);
+			
+			var newBall = new Ball(x,y,r,colors,speedX,speedY);
+			arr.push(newBall);
+		}
+		
+		// 画球
+		act()
+		function act(){
+			context.clearRect(0,0,canvas.width,canvas.height);
+			for(var i=0;i<arr.length;i++){
+				arr[i].draw();
+				arr[i].move();
+			}
+			window.requestAnimationFrame(act);
+		}
+	</script>
+</html>

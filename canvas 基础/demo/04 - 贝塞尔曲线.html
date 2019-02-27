@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>贝塞尔曲线</title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500"></canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		var x1 = 100;
+		var y1 = 100;
+		
+		var x2 = 400;
+		var y2 = 400;
+		drow(x1,y1,x2,y2);
+		function drow(x1,y1,x2,y2){
+
+            context.clearRect(0,0,canvas.width,canvas.height);
+
+			// 画半透明线
+			context.beginPath();
+			context.moveTo(500,0);
+			context.lineTo(0,500);
+			context.lineWidth = 10;
+			context.strokeStyle = "rgba(0,0,0,0.3)";
+			context.stroke();
+			
+			// 画连接线
+			context.beginPath();
+			context.moveTo(0,500);
+			context.lineTo(x1,y1);
+			context.lineWidth = 2;
+			context.strokeStyle = "#000000";
+			context.stroke();
+			
+			context.beginPath();
+			context.moveTo(500,0);
+			context.lineTo(x2,y2);
+			context.lineWidth = 2;
+			context.strokeStyle = "#000000";
+			context.stroke();
+			
+			// 画红球
+			context.beginPath();
+			context.arc(x1,y1,10,0,Math.PI*2);
+			context.fillStyle = "red";
+			context.fill();
+			
+			// 画蓝球
+			context.beginPath();
+			context.arc(x2,y2,10,0,Math.PI*2);
+			context.fillStyle = "blue";
+			context.fill();
+			
+			// 画贝塞尔曲线
+			context.beginPath();
+			context.moveTo(0,500);
+			context.lineWidth = 10;
+			context.bezierCurveTo(x1,y1,x2,y2,500,0);
+			context.stroke();
+		}
+		
+		/*
+            拖动小球做动画，判断是否拖动小球，在小球上则做动画。
+
+            鼠标按下：获取鼠标在 canvas 坐标轴内的坐标，
+            红球：
+        */ 
+        canvas.onmousedown = function(ev){ // 鼠标按下
+            var ev = ev || window.event;
+            var x = ev.clientX - canvas.offsetLeft;
+            var y = ev.clientY - canvas.offsetTop;
+            
+            var disRed = Math.pow((x - x1),2) + Math.pow((y-y1),2) - 10*10;
+            if(disRed <= 0){
+                // 鼠标在红球上
+                canvas.onmousemove = function(){
+                    var ev = ev || window.event;
+                    var xx = ev.clientX - canvas.offsetLeft;
+                    var yy = ev.clientY - canvas.offsetTop;
+                    x1 = xx;
+                    y1 = yy;
+                    drow(x1,y1,x2,y2);
+                }
+            }
+
+
+            var disBlue = Math.pow((x - x2),2) + Math.pow((y-y2),2) - 10*10;
+            if(disBlue <= 0){
+                // 鼠标在蓝球上
+                canvas.onmousemove = function(){
+                    var ev = ev || window.event;
+                    var xx = ev.clientX - canvas.offsetLeft;
+                    var yy = ev.clientY - canvas.offsetTop;
+                    x2 = xx;
+                    y2 = yy;
+                    drow(x1,y1,x2,y2);
+                }
+            }
+        }
+
+        canvas.onmouseup = function(){
+			canvas.onmousemove = "";
+		}
+	</script>
+</html>

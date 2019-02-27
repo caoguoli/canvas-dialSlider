@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>小方块碰壁反弹</title>
+	</head>
+	<style type="text/css">
+		canvas{
+			border:1px solid red;
+		}
+	</style>
+	<body>
+		<canvas id="mycanvas" width="500" height="600">
+			您的浏览器不支持canvas
+		</canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		var x = 20;
+		var y = 20;
+		var r = 20;
+		var speedx = 2;
+		var speedy = 2;
+		function draw(x,y,r){
+			context.beginPath();
+			context.fillStyle = "aquamarine";
+			context.arc(x,y,r,0,Math.PI*2);
+			context.fill();
+		}
+		
+		function act(){
+			// 清空画布
+			context.clearRect(0,0,canvas.width,canvas.height);
+			// 跟新
+			x += speedx;
+			y += speedy;
+			// 碰壁判断
+			if(x < r || x > canvas.width - r){
+				speedx *= -1;
+			}
+			if(y < r || y > canvas.height - r){
+				speedy *= -1;
+			}
+			// 重汇
+			draw(x,y,r);
+			window.requestAnimationFrame(act);
+		}
+		
+		// 执行递归动画函数
+		act();
+//		
+		
+		
+//		function Rect(x,y,r,colors){
+//			this.x = x;
+//			this.y = y;
+//			this.r = r;
+//			this.colors = colors
+//		}
+//		// 画圆
+//		Rect.prototype.draw = function(){
+//			context.beginPath();
+//			context.fillStyle = this.colors;
+//			context.arc(this.x,this.y,this.r,0,Math.PI*2);
+//			context.fill();
+//		}
+//		var newRect = new Rect(100,100,20,"blue");
+//		newRect.draw();
+	</script>
+	
+</html>

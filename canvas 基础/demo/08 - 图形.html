@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="500" height="500"></canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		context.beginPath();
+		context.moveTo(200,50);
+		context.quadraticCurveTo(50,0,200,200);
+		context.fillStyle = "red";
+		context.fill();
+		
+		context.beginPath();
+		context.moveTo(200,50);
+		context.quadraticCurveTo(350,0,200,200);
+		context.fillStyle = "red";
+		context.fill();
+		
+		context.beginPath();
+		context.moveTo(250,200);
+		context.quadraticCurveTo(150,210,250,350);
+		context.fillStyle = "red";
+		context.fill();
+		
+		context.beginPath();
+		context.moveTo(250,200);
+		context.quadraticCurveTo(350,210,250,350);
+		context.fillStyle = "red";
+		context.fill();
+		
+	</script>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="" height=""></canvas>
+	</body>
+	<script type="text/javascript">
+		
+		// 对象：主机、敌机、子弹
+		// 方法：画、动
+		// 碰撞：主机碰撞敌机、子弹碰撞敌机(像素碰撞 -- 性能问题(选做))
+		// 玩法、声音(选做)
+	
+		
+		// 第一步：图片预加载
+		var imgArr = {
+			"bg":"img/background.png",
+			"herofly":"img/herofly.png",
+			"bullet2":"img/bullet2.png"
+		}
+		var imgLength = 0;
+		for(i in imgArr){
+			imgLength ++;
+		}
+		
+		var num = 0;
+		var loadArr = {};
+		for(let i in imgArr){
+			var img = new Image();
+			img.src = imgArr[i];
+			img.onload = function(){
+				loadArr[i] = this;
+				num ++;
+				if(num >= imgLength){
+					main(loadArr);
+				}
+			}
+		}
+		// 所有图片加载完毕后
+		function main(loadArr){
+			var canvas = document.getElementById("mycanvas");
+			var context = canvas.getContext("2d");
+			canvas.width = loadArr.bg.width;
+			canvas.height = loadArr.bg.height;
+			context.drawImage(loadArr.bg,0,0);
+			// 背景图
+			function Bgimg(obj,bgSpeedY){
+				this.obj = obj;
+				this.bgSpeedY = bgSpeedY;
+			}
+			Bgimg.prototype.draw = function(){
+				context.drawImage(this.obj,0,this.y-bgSpeedY)
+			}
+			
+			// 主机对象(blood:血量；)		
+			function Hero(x,y,blood,obj){
+				this.x =x;
+				this.y = y;
+				this.blood = blood;
+				this.obj = obj;
+				this.w = loadArr.herofly.width/5;
+				this.h = loadArr.herofly.height;
+				this.index = 0;
+				this.num = 0;
+			}
+			
+			Hero.prototype.draw = function(){
+			// 血量
+			this.blood --;
+			this.num ++;
+			if(this.blood < 0){
+				if(this.num%10 == 0){
+					this.index ++;
+				}
+			}
+			
+			context.drawImage(this.obj,this.index*this.w,0,this.w,this.h,this.x,this.y,this.w,this.h);
+			}
+			var x = 120;
+			var y = canvas.height-83;
+			var newHero = new Hero(x,y,100,loadArr.herofly);
+			newHero.draw();	
+			
+			// 子弹构造函数
+			function Bullet(x,y,power,obj,speed){
+				this.x = x;
+				this.y = y;
+				this.power = power;
+				this.obj = obj;
+				this.w = obj.width;
+				this.h = obj.height;
+				
+				this.speed = speed;			
+			}
+			
+			Bullet.prototype.draw = function(){
+				context.drawImage(this.obj,0,0,this.w,this.h,this.x,this.y,this.w,this.h);	
+			}
+			Bullet.prototype.move = function(){
+				this.y -= this.speed;
+			}
+			Bullet.prototype.isClear = function(){
+				if(this.y <0){
+					return true;
+				}else{
+					return false;
+				}
+			}
+			
+			// 子弹移动
+			var num = 0;
+			// 存放子弹的容器
+			var bullet = [];
+			function act(){
+				num ++;
+				context.clearRect(0,0,canvas.width,canvas.height);
+				// 英雄机
+				newHero.draw();
+				if(num%20 == 0){
+					// 子弹
+					var newBullet = new Bullet(x+10,(newHero.y-10),2,loadArr.bullet2,2);
+					bullet.push(newBullet);
+				}
+				for(var i=0;i<bullet.length;i++){
+						bullet[i].draw();
+						bullet[i].move();
+						// 超出位置，
+						if(bullet[i].isClear()){
+							// 清除子弹
+							bullet.splice(i,1);
+						}
+				}
+				window.requestAnimationFrame(act);
+			}
+			act();
+			
+			
+	
+	
+	
+	
+	
+	
+	
+	
+		}
+		
+		
+	</script>
+</html>

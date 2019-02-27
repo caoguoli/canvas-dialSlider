@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="600" height="600"></canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		// 规则：
+		// 1、蛇头不能碰壁
+		// 2、蛇头不能碰自己
+		// 3、吃到食物，身体增加
+		// 4、食物随机出现  - 不能随机在蛇身体上
+		// 5、操作：上下左右(不能反方向移动)
+		// 6、蛇动:蛇之前的位置添加一个格子，最后面减去一个格子
+		
+		
+		// 先定义一个方块类
+		class Rect{
+			constructor(x,y,color){
+				this.x = x;
+				this.y = y;
+				this.color = color;
+				this.w = 40;
+				this.h = 40;
+			}
+			// 画方块
+			draw(){
+				context.beginPath();
+				context.fillStyle = this.color;
+				context.fillRect(this.x,this.y,this.w,this.h);
+				context.strokeRect(this.x,this.y,this.w,this.h);
+			}
+		}
+		
+		// 定义一个蛇类
+			// 属性里，
+				// 1、定义一个数组 -- bodyArr，存放方块实列化对象，第一个存蛇头(splice)
+				// 2、键盘 -- dis, 按键的时候，判断其值:
+				//
+			// 方法:3、
+			
+		class Shake{
+			constructor(){
+				this.bodyArr = [];
+				// 初始化蛇  -- 将实列化方块放入数组 
+				for(var i=0;i<4;i++){
+					var newRect = new Rect(i*40,0,"gray");
+					// 反着加 -- 蛇头变为第一个
+					this.bodyArr.splice(0,0,newRect);  // 添加位置，删除位置(0:不删除),添加对象
+				}
+				// 键盘移动
+				this.dis = "right";
+				// 是否存活 -- 控制键
+				this.isLive = true;
+			}
+			draw(){
+				for(var i=0;i<this.bodyArr.length;i++){
+					if(i == 0){
+						this.bodyArr[i].color = "red";
+					}
+					this.bodyArr[i].draw();  // 实列化的方块，调用draw
+				}
+			}
+			move(){
+				// 实列化小方块，加在蛇头后面
+				var addRect = new Rect(this.bodyArr[0].x,this.bodyArr[0].y,"gray");
+				// 移动蛇头
+				switch(this.dis){
+					case "right":
+						this.bodyArr[0].x += 40;
+						break;
+					case "down":
+						this.bodyArr[0].y += 40;
+						break;
+					case "left":
+						this.bodyArr[0].x -= 40;
+						break;
+					default:
+						this.bodyArr[0].y -= 40;
+						break;
+				}
+				
+				// 碰壁检测  -- 蛇头先碰
+				if(this.bodyArr[0].x <0 || this.bodyArr[0].x > canvas.width - 40 || this.bodyArr[0].y <0 || this.bodyArr[0].y > canvas.height - 40){
+					console.log("挂了")
+					this.isLive = false;
+				}
+				// 蛇头和自身检测碰撞 -- 蛇在前四个是撞不到的
+				// 每次走的都是一个方块的x，y;蛇头与身体某个方块重叠的时候 -- 碰撞了
+				for(var i=3;i<this.bodyArr.length;i++){
+					if(this.bodyArr[i].x == this.bodyArr[0].x && this.bodyArr[i].y == this.bodyArr[0].y){
+						this.isLive = false;
+					}
+				}
+				
+				// 判断蛇头是否吃到食物
+				if(this.bodyArr[0].x == Food.x && this.bodyArr[0].y == Food.y){
+					// 蛇头和食物撞上了(不删除最后一个方块)
+					Food = createFood();
+					
+				}else{
+					// 删除最后一个方块
+					this.bodyArr.pop();
+				}
+				// 方块加入蛇身
+				this.bodyArr.splice(1,0,addRect);
+			}
+		}
+		
+		var newShake = new Shake();
+		newShake.draw();
+		Food = createFood();  // 在外面保存，不用再次获取随机数
+		var num = 0;
+		function act(){
+			num ++;
+			if(num %10 == 0){
+				context.clearRect(0,0,canvas.width,canvas.height);
+				newShake.draw();
+				newShake.move();
+				// 画食物
+				Food.draw();
+			}
+			if(newShake.isLive){
+				window.requestAnimationFrame(act);
+			}
+		}
+		act();
+		
+		// 键盘事件
+		document.onkeydown = function(e){
+			var ev = e || window.event;
+			switch(ev.keyCode){
+				case 37:
+					if(newShake.dis != "right"){
+						newShake.dis = "left";
+					}
+					break;
+				case 38:
+					if(newShake.dis != "down"){
+						newShake.dis = "up";
+					}
+					break;
+				case 39:
+					if(newShake.dis != "left"){
+						newShake.dis = "right";
+					}
+					break;
+				case 40:
+					if(newShake.dis != "up"){
+						newShake.dis = "down";
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		
+		
+		// 随机食物
+		function randNum(min,max){
+			return parseInt(Math.random()*(max-min))+min;
+		}
+		function createFood(){
+			// 随机食物位置
+			// 
+			var judge = true;
+			while(judge){
+				var x = randNum(0,15)*40;
+				var y = randNum(0,15)*40;
+				var newFood = new Rect(x,y,"green");
+				// 满足条件
+				var sure = true;  
+				for(var i=0;i<newShake.bodyArr.length;i++){
+					if(newShake.bodyArr[i].x == x && newShake.bodyArr[i].y == y){
+						// 不满足条件
+						sure = false;
+					}
+				}
+				if(sure){
+					judge = false;
+				}
+			}
+			return newFood;
+		}
+		
+	</script>
+</html>

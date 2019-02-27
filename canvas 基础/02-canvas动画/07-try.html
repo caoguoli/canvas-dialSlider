@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			canvas{
+				border:1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="600" height="600"></canvas>
+	</body>
+	<script type="text/javascript">
+		var canvas = document.getElementById("mycanvas");
+		var context = canvas.getContext("2d");
+		
+		// 一、方块对象
+		class Rect{
+			constructor(x,y,color){
+				this.x = x;
+				this.y = y;
+				this.color = color;
+			}
+			draw(){
+				context.beginPath();
+				context.fillStyle = this.color;
+				context.fillRect(this.x,this.y,40,40);
+				context.strokeRect(this.x,this.y,40,40);
+			}
+		}
+		// 二、蛇
+		class Shake{
+			constructor(){
+				this.bodyArr = [];
+				for(var i=0;i<10;i++){
+					var newRect = new Rect(i*40,0,"blue");
+					this.bodyArr.splice(0,0,newRect);
+				}
+				this.isLive = true;  // 判断游戏是否结束
+				this.keys = "right";
+			}
+			draw(){
+				this.bodyArr[0].color = "red";
+				for(var i=0;i<this.bodyArr.length;i++){
+					this.bodyArr[i].draw();
+				}
+			}
+			move(){
+//				-- 一、数组里添加或删除
+				// 画在蛇头位置放一个新的身体方块 
+				var addRect = new Rect(this.bodyArr[0].x,this.bodyArr[0].y,"blue");
+				this.bodyArr.splice(1,0,addRect);
+				// 蛇尾擦除一个身体方块
+				this.bodyArr.pop();
+				// 移动蛇头
+				if(this.key == "right"){
+					this.bodyArr[0].x += 40;
+				}
+				switch(this.keys){
+					case "right":
+						this.bodyArr[0].x += 40;
+						break;
+					case "left":
+						this.bodyArr[0].x -= 40;
+						break;
+					case "down":
+						this.bodyArr[0].y -= 40;
+						break;
+					default:
+						this.bodyArr[0].y += 40;
+						break;
+				}
+				
+				// 二、碰撞检测 -- 针对蛇头
+				if(this.bodyArr[0].x < 0 || this.bodyArr[0].x > canvas.width - 40 || this.bodyArr[0].y<0 || this.bodyArr[0].y > canvas.height - 40){
+					this.isLive = false;
+				}
+				// 三、碰身检测 -- 针对蛇身
+				for(var i=4;i<this.bodyArr.length;i++){
+					if(this.bodyArr[0].x == this.bodyArr[i].x && this.bodyArr[0].y == this.bodyArr[i].y){
+						this.isLive = false;
+					}
+				}
+			}
+		}
+		
+		
+		// 随机食物
+		function randNum(min,max){
+			return parseInt(Math.random()*(max - min))+min;
+		}
+		function createFood(){
+			var x = randNum(0,parseInt(canvas.width/40))*40;
+			var y = randNum(0,parseInt(canvas.height/40))*40;
+			var newRect = new Rect(x,y,"pink");
+			return newRect;
+		}
+
+		//******** 实列化蛇
+		var newShake = new Shake();
+		newShake.draw();  // 蛇开始值
+		var num = 0;      // 控制蛇移动速度
+		
+		var newFood = createFood();
+		function act(){
+			num ++;
+			if(num%10 == 0){
+				context.clearRect(0,0,canvas.width,canvas.height);
+				newShake.draw();  
+				newShake.move();
+				// 画食物
+				// 食物不能随机到蛇上
+				var foodRp = 0;
+				for(var i=0;i<newShake.bodyArr.length;i++){
+					
+					if(newShake.bodyArr[i].x != newFood.x && newShake.bodyArr[i].y != newFood.y){
+						foodRp ++;
+					}
+				}
+
+				if(foodRp == newShake.bodyArr.length){
+					console.log("hha")
+				}
+				newFood.draw();
+				
+			}
+			if(newShake.isLive){
+				window.requestAnimationFrame(act);
+			}
+		}
+		
+		act();    // 开始
+		document.onkeydown = function(ev){
+			var evObj = ev || window.event;
+			switch(evObj.keyCode){
+				case 37:
+					newShake.keys = "left";
+					break;
+				case 38:
+					newShake.keys = "down";
+					break;
+				case 39:
+					newShake.keys = "right";
+					break;
+				case 40:
+					newShake.keys = "up";
+					break;
+				default:
+					break;
+			}
+		}
+	</script>
+</html>

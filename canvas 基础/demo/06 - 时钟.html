@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>时钟</title>
+    <style>
+        canvas {
+            border: 1px solid red;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="mycanvas" width="500" height="500">
+        您的浏览器不支持canvas
+    </canvas>
+</body>
+<script>
+
+    var canvas = document.getElementById("mycanvas");
+    var ctx = canvas.getContext("2d");
+
+    function draw() {
+        /*
+         1、改变中心坐标系，
+        */
+        var width = canvas.width;   // 改变坐标
+        var height = canvas.height;
+        ctx.clearRect(250, -250, width, height);
+        ctx.save();
+
+        ctx.translate(width / 2, height / 2);
+        ctx.rotate(-Math.PI / 2);
+
+        ctx.beginPath();
+        ctx.fillStyle = '#000';
+        ctx.arc(0, 0, width / 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let i = 0; i < 60; i++) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = 'pink';
+            ctx.rotate(Math.PI * 2 * (1 / 60) * i);
+            ctx.translate(width / 2 - 40, 0);
+            ctx.fillRect(0, -2, 40, 4);
+            ctx.restore();
+        }
+        for (let i = 0; i < 12; i++) {
+            ctx.save();        // 保存坐标，
+            ctx.beginPath();
+            ctx.fillStyle = '#fff';
+            ctx.rotate(Math.PI * 2 * (1 / 12) * i);
+            ctx.translate(width / 2 - 50, 0);
+            ctx.fillRect(0, -4, 50, 8);
+            ctx.restore();     // 释放坐标
+        }
+
+        // 获取当前时间
+        var nowDate = new Date();
+        var hour = nowDate.getHours();
+        var minute = nowDate.getMinutes();
+        var second = nowDate.getSeconds();
+
+        let rotate_S = second * Math.PI * 2 / 60;
+        let rotate_M = (minute + second / 60) * Math.PI * 2 / 60;
+        let rotate_H = (hour + rotate_M / 60 + second / 3600) * Math.PI * 2 / 12;
+
+        // 时
+        ctx.save();
+        ctx.rotate(rotate_H);
+        ctx.fillStyle = 'blue';
+        ctx.lineCap = 'round';
+        ctx.fillRect(0, -5, 100, 10);
+        ctx.restore();
+
+        // 分
+        ctx.save();
+        ctx.rotate(rotate_M);
+        ctx.fillStyle = 'yellow';
+        ctx.lineCap = 'round';
+        ctx.fillRect(0, -2.5, 150, 5);
+        ctx.restore();
+
+        // 秒
+        ctx.save();
+        ctx.rotate(rotate_S);
+        ctx.fillStyle = 'pink';
+        ctx.lineCap = 'round';
+        ctx.fillRect(0, -1.5, 200, 3);
+        ctx.restore();
+
+        ctx.restore();
+    }
+
+    
+    var a = 1;
+    act(a);
+    function act(a) {
+        draw();
+        var aniFram;
+        aniFram =  window.requestAnimationFrame(act);
+    }
+
+</script>
+
+</html>

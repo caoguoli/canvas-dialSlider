@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>太极</title>
+    <style type="text/css">
+        canvas {
+            border: 1px solid red;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="mycanvas" width="500" height="500"></canvas>
+</body>
+<script>
+    var canvas = document.getElementById('mycanvas');
+    var context = canvas.getContext('2d');  // 
+    /*
+        1、先画 左（黑色）、右 （白色）的两个大半圆
+        2、上画 黑色的 中等小圆 、下画白色的中等小圆
+        3、上画 白色的 小圆 、下画黑色的小圆
+    */
+
+    context.beginPath();
+    context.fillStyle = "gray";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.beginPath();
+    context.arc(250, 250, 250, Math.PI * 0.5, Math.PI * 1.5);
+    context.fillStyle = "#000";
+    context.fill();
+
+    context.beginPath();
+    context.arc(250, 250, 250, Math.PI * 1.5, Math.PI * 0.5);
+    context.fillStyle = "#fff";
+    context.fill();
+
+    context.beginPath();
+    context.arc(250, 125, 125, 0, Math.PI * 2);
+    context.fillStyle = "#000";
+    context.fill();
+
+    context.beginPath();
+    context.arc(250, 375, 125, 0, Math.PI * 2);
+    context.fillStyle = "#fff";
+    context.fill();
+
+    context.beginPath();
+    context.arc(250, 125, 20, 0, Math.PI * 2);
+    context.fillStyle = "#fff";
+    context.fill();
+
+    context.beginPath();
+    context.arc(250, 375, 20, 0, Math.PI * 2);
+    context.fillStyle = "#000";
+    context.fill();
+
+</script>
+
+</html>
