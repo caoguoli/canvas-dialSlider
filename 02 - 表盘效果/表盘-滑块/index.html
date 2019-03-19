@@ -155,21 +155,6 @@
             return
         }
 
-
-        // return;
-        // if(x1 < x){
-        //     // 右滑
-        //     console.log("========================= 右滑");
-        //     xiaoyunaCir =  xiaoyunaCir + 1 <= max ?  xiaoyunaCir + 1 : max;
-        //     getCanvasFn(90, 10, min, max, xiaoyunaCir);
-        // }else if(x1 > x){
-        //     // 左滑
-        //     xiaoyunaCir = xiaoyunaCir - 1 >= min ? xiaoyunaCir - 1 : min;
-        //     getCanvasFn(90, 10, min, max, xiaoyunaCir);
-        //     console.log("========================= 左滑");
-        // }
-        // x1 = x;
-
         var mind = ((max - min) / 2 - xiaoyunaCir) < 0 ? -1 : 1;
         if (mind != 0 && (xiaoyunaCir < 20 || xiaoyunaCir > 60)) {
             // 左边、右边

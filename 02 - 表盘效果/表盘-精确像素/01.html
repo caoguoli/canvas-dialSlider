@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>像素三</title>
+</head>
+<style>
+    #canvas {
+        border: 1px solid;
+        background: gray;
+    }
+</style>
+
+<body>
+
+    <canvas id="canvas"></canvas>
+</body>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script>
+    let getCanvas = (min_wind, max_wind, canvasWind, now_wind) => {
+
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        ctx.save();
+        ctx.clearRect(0, 0, canvas_X, canvas_Y); // 清除画布
+
+
+
+        var pageX = document.body.clientWidth;
+        canvas.width = pageX * 0.6;
+        canvas.height = pageX * 0.6;
+
+        // ------------------------------------------------------------- 精确像素：将其放开
+        // var backingStore = ctx.backingStorePixelRatio ||
+        //     ctx.webkitBackingStorePixelRatio ||
+        //     ctx.mozBackingStorePixelRatio ||
+        //     ctx.msBackingStorePixelRatio ||
+        //     ctx.oBackingStorePixelRatio ||
+        //     ctx.backingStorePixelRatio || 1;
+
+        // var ratio = (window.devicePixelRatio || 1) / backingStore;
+
+        // canvas.style.width = pageX * 0.6 + 'px';
+        // canvas.style.height = pageX * 0.6 + 'px';
+        // canvas.width = pageX * 0.6 * ratio;
+        // canvas.height = pageX * 0.6 * ratio;
+        // // 放大倍数
+        // ctx.scale(ratio, ratio);
+
+
+        let r = pageX * 0.6 / 2 * 0.8;
+        let cirWidth = r / 7;
+        var cirMin = 0.75;
+        var canvasWind = canvasWind >= min_wind && canvasWind <= max_wind ? canvasWind : (canvasWind < min_wind ? min_wind : max_wind);
+        var cirMax = (2.25 - 0.75) * (canvasWind - min_wind) / (max_wind - min_wind) + 0.75;
+        var x1 = r * Math.cos(cirMax * Math.PI);
+        var y1 = r * Math.sin(cirMax * Math.PI);
+        var xiaoyuanX = Math.ceil(pageX * 0.6 / 2 + x1);
+        var xiaoyuanY = Math.ceil(pageX * 0.6 / 2 + y1);
+        var canvas_X = pageX * 0.6;
+        var canvas_Y = pageX * 0.6;
+
+
+        // 静态显示
+        // -- 背景圆
+        ctx.beginPath();
+        ctx.translate(canvas_X / 2, canvas_Y / 2);
+        ctx.lineWidth = cirWidth;
+        // ctx.strokeStyle = "#048FEB";
+        ctx.strokeStyle = '#048FEB';
+        ctx.arc(0, 0, r, cirMin * Math.PI, 2.25 * Math.PI, false);
+        ctx.stroke();
+        // -- 范围
+        // ===== min
+        ctx.beginPath();
+        var leftX_x1 = (r - cirWidth / 2) * Math.cos(0.735 * Math.PI);
+        var leftY_y1 = (r - cirWidth / 2) * Math.sin(0.735 * Math.PI);
+        var leftX_x2 = (r + cirWidth * 2) * Math.cos(0.735 * Math.PI);
+        var leftY_y2 = (r + cirWidth * 2) * Math.sin(0.735 * Math.PI);
+        ctx.moveTo(leftX_x1, leftY_y1);
+        ctx.lineTo(leftX_x2, leftY_y2);
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        // 字体
+        ctx.beginPath();
+        ctx.font = "normal 14px Arical";
+        ctx.fillStyle = "#fff"
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText(min_wind, leftX_x2 - 20, leftY_y2 + 5);
+        ctx.font = "normal 8px Arical";
+        ctx.fillStyle = "#fff"
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText("℃", leftX_x2 - 6, leftY_y2 + 5);
+
+        // ===== max
+        ctx.beginPath();
+        var rightX_x1 = (r - cirWidth / 2) * Math.cos(2.265 * Math.PI);
+        var rightY_y1 = (r - cirWidth / 2) * Math.sin(2.265 * Math.PI);
+        var rightX_x2 = (r + cirWidth * 2) * Math.cos(2.265 * Math.PI);
+        var rightY_y2 = (r + cirWidth * 2) * Math.sin(2.265 * Math.PI);
+        ctx.moveTo(rightX_x1, rightY_y1);
+        ctx.lineTo(rightX_x2, rightY_y2);
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 字体
+        ctx.beginPath();
+        ctx.font = "normal 14px Arical";
+        ctx.fillStyle = "#fff"
+
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText(max_wind, rightX_x2 + cirWidth, rightY_y2 + 5);
+        ctx.font = "normal 8px Arical";
+        ctx.fillStyle = "#fff"
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText("℃", rightX_x2 + 26, rightY_y2 + 5);
+        // ==== 当前温度
+        ctx.font = "normal 14px Arical";
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText("当前温度", 0, rightY_y2 + 5);
+        let xiaoyuanR;
+
+        // 显示温度
+        ctx.font = "bold 60px Arical";
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+    
+        if (now_wind > min_wind && now_wind <= max_wind) {
+            ctx.fillText(now_wind, 0, 0);
+        } else {
+            ctx.fillText("--", 0, 0);
+        }
+        ctx.font = "normal 14px Arical";
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = "center";
+        ctx.fillText("℃", (r - cirWidth * 1.5) * Math.cos(1.75 * Math.PI), (r - cirWidth * 3) * Math.sin(1.75 * Math.PI));
+        // 显示进度
+
+
+        ctx.beginPath();
+        ctx.lineWidth = cirWidth + 1;
+        ctx.strokeStyle = "#fff";
+        ctx.arc(0, 0, r, cirMin * Math.PI, cirMax * Math.PI, false);
+        ctx.stroke();
+        // 小球
+        xiaoyuanR = cirWidth * 0.9;
+        if (canvasWind > min_wind && now_wind <= max_wind) {
+            ctx.beginPath();
+            ctx.arc(x1, y1, cirWidth * 0.9, 0, Math.PI * 2, false);
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+        } else {
+            canvasWind = 16;
+        }
+
+        ctx.restore();
+        let obj = { r, xiaoyuanX, xiaoyuanY, xiaoyuanR, canvasWind, x1, y1 }
+        return obj;
+    }
+
+    getCanvas(16,32,20,30);
+
+</script>
+
+</html>
